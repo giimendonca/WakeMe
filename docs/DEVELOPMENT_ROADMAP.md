@@ -11,17 +11,17 @@ O roadmap organiza o desenvolvimento por entregas. As etapas podem ser ajustadas
 - [ ] Configurar Git local e fluxo de commits.
 
 ## Fase 1 — Fundação do aplicativo
-- [ ] Definir arquitetura de pacotes.
-- [ ] Configurar tema Material 3.
+- [x] Definir arquitetura de pacotes.
+- [x] Configurar tema Material 3.
 - [ ] Implementar navegação principal.
-- [ ] Criar componentes reutilizáveis.
-- [ ] Preparar suporte a diferentes tamanhos de tela.
+- [x] Criar componentes reutilizáveis.
+- [x] Preparar suporte a diferentes tamanhos de tela.
 
 ## Fase 2 — Personalização local
-- [ ] Implementar temas claro e escuro.
+- [x] Implementar temas claro e escuro.
 - [ ] Criar paletas e preferências.
 - [ ] Implementar seleção de wallpaper.
-- [ ] Persistir preferências localmente.
+- [x] Persistir preferências de tema localmente.
 
 ## Fase 3 — Mensagens
 - [ ] Criar tela de mensagens.
