@@ -14,4 +14,5 @@ sealed interface SessionState {
     data object Loading : SessionState
     data object SignedOut : SessionState
     data class SignedIn(val user: AuthUser) : SessionState
+    data class ProfileError(val user: AuthUser, val message: String) : SessionState
 }

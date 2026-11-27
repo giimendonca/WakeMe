@@ -8,14 +8,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.FirebaseApp
@@ -67,7 +70,8 @@ class MainActivity : ComponentActivity() {
                     when (val session = authState.session) {
                         SessionState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                         SessionState.SignedOut -> AuthScreen(authState.busy, authState.message, authState.messageIsError,
-                            authViewModel::signIn, authViewModel::register, authViewModel::resetPassword)
+                            authViewModel::signIn, authViewModel::register, authViewModel::resetPassword,
+                            authViewModel::clearMessage)
                         is SessionState.SignedIn -> WakeMeNavigation(
                         themePreference = appearance.theme,
                         accentColor = appearance.accentColor,
@@ -77,6 +81,19 @@ class MainActivity : ComponentActivity() {
                         onAccentColorChange = { accentColor ->
                             lifecycleScope.launch { preferencesRepository.setAccentColor(accentColor) }
                         }, onSignOut = authViewModel::signOut)
+                        is SessionState.ProfileError -> Column(
+                            modifier = Modifier.fillMaxSize().padding(24.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(session.message, color = MaterialTheme.colorScheme.error)
+                            Button(onClick = authViewModel::retryProfileLoad, enabled = !authState.busy) {
+                                Text(if (authState.busy) "Carregando…" else "Tentar novamente")
+                            }
+                            Button(onClick = authViewModel::signOut, enabled = !authState.busy) {
+                                Text("Sair da conta")
+                            }
+                        }
                     }
                     }
                 }

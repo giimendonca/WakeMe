@@ -13,50 +13,125 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AuthViewModelTest {
-    @Test fun loginPublishesSessionOnlyAfterProfileIsReady() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        try {
-            val repository = FakeAuthRepository()
+    @Test fun loginWithExistingProfileAndMissingDisplayNameCompletesSession() = runTest {
+        withMainDispatcher {
+            val auth = FakeAuthRepository()
             val profiles = FakeProfileRepository()
-            val viewModel = AuthViewModel(repository, profiles)
+            val viewModel = AuthViewModel(auth, profiles)
 
             viewModel.signIn("ana@example.com", "secret1")
             advanceUntilIdle()
 
-            assertEquals(SessionState.SignedIn(AuthUser("uid-1", "Ana", "ana@example.com")), viewModel.state.value.session)
+            assertEquals(SessionState.SignedIn(AuthUser("uid-1", null, "ana@example.com")), viewModel.state.value.session)
+            assertEquals("", profiles.lastProfile?.name)
             assertEquals(1, profiles.ensureCalls)
-        } finally { Dispatchers.resetMain() }
+        }
     }
 
-    @Test fun failedProfileWriteDoesNotOpenAuthenticatedNavigation() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        try {
-            val viewModel = AuthViewModel(FakeAuthRepository(), FakeProfileRepository(fail = true))
+    @Test fun newRegistrationUsesNameEnteredInForm() = runTest {
+        withMainDispatcher {
+            val profiles = FakeProfileRepository()
+            val viewModel = AuthViewModel(FakeAuthRepository(), profiles)
+
+            viewModel.register("Ana Silva", "ana@example.com", "secret1")
+            advanceUntilIdle()
+
+            assertEquals("Ana Silva", profiles.lastProfile?.name)
+            assertTrue(viewModel.state.value.session is SessionState.SignedIn)
+        }
+    }
+
+    @Test fun mismatchedPasswordConfirmationDoesNotCallAuthenticationRepository() = runTest {
+        withMainDispatcher {
+            val auth = FakeAuthRepository()
+            val viewModel = AuthViewModel(auth, FakeProfileRepository())
+
+            viewModel.register("Ana", "ana@example.com", "secret1", "secret2")
+            advanceUntilIdle()
+
+            assertEquals(0, auth.registerCalls)
+            assertEquals("As senhas não coincidem.", viewModel.state.value.message)
+        }
+    }
+
+    @Test fun firestoreNetworkFailureKeepsAuthenticatedUserAndCanRecover() = runTest {
+        withMainDispatcher {
+            val auth = FakeAuthRepository()
+            val profiles = FakeProfileRepository(failuresRemaining = 1)
+            val viewModel = AuthViewModel(auth, profiles)
 
             viewModel.signIn("ana@example.com", "secret1")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.state.value.session is SessionState.ProfileError)
+            assertEquals("uid-1", auth.session.value?.uid)
+
+            viewModel.retryProfileLoad()
+            advanceUntilIdle()
+
+            assertEquals(SessionState.SignedIn(AuthUser("uid-1", null, "ana@example.com")), viewModel.state.value.session)
+            assertEquals(2, profiles.ensureCalls)
+        }
+    }
+
+    @Test fun startupRestoresPersistedAuthSessionOnlyAfterProfileLoads() = runTest {
+        withMainDispatcher {
+            val persistedUser = AuthUser("uid-1", null, "ana@example.com")
+            val auth = FakeAuthRepository(initialUser = persistedUser)
+            val profiles = FakeProfileRepository()
+            val viewModel = AuthViewModel(auth, profiles)
+
+            advanceUntilIdle()
+
+            assertEquals(SessionState.SignedIn(persistedUser), viewModel.state.value.session)
+            assertEquals(1, profiles.ensureCalls)
+        }
+    }
+
+    @Test fun logoutClearsSession() = runTest {
+        withMainDispatcher {
+            val auth = FakeAuthRepository(initialUser = AuthUser("uid-1", "Ana", "ana@example.com"))
+            val viewModel = AuthViewModel(auth, FakeProfileRepository())
+            advanceUntilIdle()
+
+            viewModel.signOut()
             advanceUntilIdle()
 
             assertEquals(SessionState.SignedOut, viewModel.state.value.session)
-            assertEquals(true, viewModel.state.value.messageIsError)
-        } finally { Dispatchers.resetMain() }
+            assertEquals(null, auth.session.value)
+        }
     }
 
-    private class FakeAuthRepository : AuthRepository {
-        override val session = MutableStateFlow<AuthUser?>(null)
-        override suspend fun register(name: String, email: String, password: String) = AuthUser("uid-1", name, email)
-        override suspend fun signIn(email: String, password: String) = AuthUser("uid-1", "Ana", email).also { session.value = it }
+    private suspend fun kotlinx.coroutines.test.TestScope.withMainDispatcher(block: suspend () -> Unit) {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try { block() } finally { Dispatchers.resetMain() }
+    }
+
+    private class FakeAuthRepository(initialUser: AuthUser? = null) : AuthRepository {
+        override val session = MutableStateFlow(initialUser)
+        var registerCalls = 0
+        override suspend fun register(name: String, email: String, password: String) =
+            AuthUser("uid-1", null, email).also { registerCalls++; session.value = it }
+        override suspend fun signIn(email: String, password: String) =
+            AuthUser("uid-1", null, email).also { session.value = it }
         override suspend fun sendPasswordReset(email: String) = Unit
         override suspend fun signOut() { session.value = null }
     }
 
-    private class FakeProfileRepository(private val fail: Boolean = false) : ProfileRepository {
+    private class FakeProfileRepository(private var failuresRemaining: Int = 0) : ProfileRepository {
         var ensureCalls = 0
+        var lastProfile: UserProfile? = null
         override suspend fun ensure(profile: UserProfile) {
             ensureCalls++
-            if (fail) throw IllegalStateException("profile unavailable")
+            lastProfile = profile
+            if (failuresRemaining > 0) {
+                failuresRemaining--
+                throw IllegalStateException("network unavailable")
+            }
         }
         override suspend fun get(uid: String): UserProfile? = null
     }

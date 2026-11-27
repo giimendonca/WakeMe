@@ -21,4 +21,19 @@ class AuthFormValidationTest {
         assertNull(AuthFormValidation.validate("Ana", "ana@example.com", "secret1", true))
         assertNull(AuthFormValidation.validate("", "ana@example.com", "x", false))
     }
+
+    @Test fun rejectsRegistrationWhenPasswordsDoNotMatch() {
+        assertEquals(
+            "As senhas não coincidem.",
+            AuthFormValidation.validate("Ana", "ana@example.com", "secret1", true, "secret2")
+        )
+    }
+
+    @Test fun acceptsRegistrationWhenPasswordsMatch() {
+        assertNull(AuthFormValidation.validate("Ana", "ana@example.com", "secret1", true, "secret1"))
+    }
+
+    @Test fun loginDoesNotRequirePasswordConfirmation() {
+        assertNull(AuthFormValidation.validate("", "ana@example.com", "secret1", false, "different"))
+    }
 }
