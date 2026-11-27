@@ -6,11 +6,13 @@ Este documento descreve entidades conceituais. Os nomes, campos e índices finai
 
 ### Users
 Representa uma conta individual.
-- `uid` — identificador do Firebase Authentication.
-- `displayName` — nome de exibição.
-- `email` — e-mail, quando disponível.
-- `createdAt` — data de criação.
-- `preferences` — preferências gerais não sensíveis.
+- Caminho Firestore: `/users/{uid}`; o UID do Firebase Authentication é o identificador principal.
+- `uid` — obrigatório e igual ao ID do documento.
+- `name` — nome de exibição informado no cadastro.
+- `email` — e-mail da identidade autenticada.
+- `createdAt` — timestamp de servidor, preservado nas atualizações.
+- `updatedAt` — timestamp de servidor da última criação/atualização.
+- Senhas nunca são armazenadas no Firestore; ficam sob gestão do Firebase Authentication.
 
 ### Devices
 Representa uma instalação/dispositivo associado a uma conta.
@@ -47,6 +49,8 @@ Representa a solicitação de alerta.
 - `senderUid`
 - `connectionId`
 - `messageId` ou conteúdo validado da mensagem.
+- `title` — título opcional do alerta.
+- `visual` — composição selecionada (ícone, tipo/cor de fundo, configuração de padrão ou referência da imagem), sujeita a validação antes de transmissão.
 - `soundId`
 - `createdAt`
 - `status`
@@ -125,4 +129,8 @@ erDiagram
 
 ## 5. Observações
 
+O schema efetivamente habilitado nesta etapa contém apenas `/users/{uid}`. `firestore.rules` restringe acesso ao próprio documento e não permite campos extras. Dispositivos, convites e conexões continuam sendo modelos futuros, sem dados fictícios.
+
 Este modelo é conceitual e não deve ser tratado como schema definitivo. Antes da implementação, serão definidos caminhos de coleções/documentos, índices compostos, regras de segurança e estratégia de exclusão/retention.
+
+O editor atual mantém um `AlertDraft` local, separado da interface. A URI escolhida pelo Photo Picker é uma referência local do dispositivo e não deve ser enviada ao Firestore como se fosse mídia remota. Um futuro formato persistido/transmitido deverá definir como compartilhar os recursos visuais incluídos no app e como disponibilizar imagens privadas aos destinatários.

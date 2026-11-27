@@ -3,7 +3,6 @@ package com.wakeme.app.ui.screens.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.wakeme.app.data.preferences.ThemePreference
 import com.wakeme.app.ui.components.GradientCard
 import com.wakeme.app.ui.components.SectionTitle
+import com.wakeme.app.ui.components.ThemePreferencePicker
 
 @Composable
 fun HomeScreen(
@@ -50,7 +49,6 @@ fun HomeScreen(
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Text("WakeMe", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
             Text("Bom ter você por aqui.", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.72f))
 
             GradientCard(darkTheme = darkTheme) {
@@ -70,15 +68,7 @@ fun HomeScreen(
             Card(shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Tema do aplicativo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ThemePreference.entries.forEach { option ->
-                            FilterChip(
-                                selected = themePreference == option,
-                                onClick = { onThemePreferenceChange(option) },
-                                label = { Text(option.label()) }
-                            )
-                        }
-                    }
+                    ThemePreferencePicker(themePreference, onThemePreferenceChange)
                     Text("Wallpapers e outras opções visuais estarão disponíveis futuramente.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 }
             }
@@ -86,7 +76,6 @@ fun HomeScreen(
         }
     }
 }
-
 @Composable
 private fun InfoCard(title: String, description: String, highlighted: Boolean = false) {
     Card(
@@ -100,10 +89,4 @@ private fun InfoCard(title: String, description: String, highlighted: Boolean = 
             Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f))
         }
     }
-}
-
-private fun ThemePreference.label(): String = when (this) {
-    ThemePreference.SYSTEM -> "Sistema"
-    ThemePreference.LIGHT -> "Claro"
-    ThemePreference.DARK -> "Escuro"
 }

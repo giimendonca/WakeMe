@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      function ownsDocument() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow create: if ownsDocument()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['uid', 'name', 'email', 'createdAt', 'updatedAt'])
+        && request.resource.data.uid == userId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+
+      allow read: if ownsDocument();
+
+      allow update: if ownsDocument()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['uid', 'name', 'email', 'createdAt', 'updatedAt'])
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt is timestamp;
+
+      allow delete: if ownsDocument();
+    }
+  }
+}

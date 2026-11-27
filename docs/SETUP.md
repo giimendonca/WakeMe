@@ -77,6 +77,21 @@ Antes de iniciar o desenvolvimento, confirmar:
 - [ ] Repositório WakeMe clonado localmente.
 - [ ] Primeiro projeto Compose consegue compilar e executar.
 
-## 8. Observações
+## 8. Firebase (contas e perfis)
 
-A instalação do Android Studio não exige criar imediatamente um projeto Firebase. Primeiro validaremos o ambiente Android local. Firebase será configurado quando a fundação do aplicativo estiver pronta.
+Esta etapa usa somente Firebase Authentication (e-mail/senha) e Cloud Firestore. O projeto Android já contém os SDKs e `firestore.rules`, mas não contém configuração específica de um projeto Firebase.
+
+1. Crie um projeto Firebase no [Firebase Console](https://console.firebase.google.com/). Para esta etapa, use o plano Spark e não associe faturamento. Authentication por e-mail/senha não exige upgrade; o Firestore tem cotas sem custo (atualmente 1 GiB, 50 mil leituras/dia e 20 mil gravações/dia). No Spark, exceder a cota pausa o serviço até o próximo ciclo ou upgrade; no Blaze, uso excedente pode ser cobrado. Confira os limites atuais na [página de planos e preços](https://firebase.google.com/docs/projects/billing/firebase-pricing-plans) antes de habilitar cobrança.
+2. Em **Configurações do projeto > Seus apps**, registre um app Android com o ID `com.wakeme.app`.
+3. Baixe o `google-services.json` e coloque-o em `app/google-services.json`. O arquivo é ignorado pelo Git. Não use arquivos de service account nem compartilhe credenciais administrativas.
+4. Em **Authentication > Sign-in method**, habilite **E-mail/senha**.
+5. Crie o banco Cloud Firestore em modo de produção, escolha a região com cuidado (a região não pode ser trocada depois) e publique as regras do arquivo `firestore.rules` na aba **Regras**.
+6. Sincronize o Gradle e execute o app. O plugin Google Services só é aplicado quando `app/google-services.json` existe. Sem ele, o app mostra uma instrução de configuração e não tenta abrir a Home.
+
+As regras permitem a cada usuário ler, criar, atualizar ou remover apenas `/users/{seu UID}`. O perfil aceita apenas UID, nome, e-mail e datas; o e-mail precisa corresponder à conta autenticada e a data de criação não pode ser alterada. Coleções futuras permanecem fechadas por padrão.
+
+Authentication e Firestore têm cotas gratuitas, mas uso acima delas ou recursos futuros (como Cloud Functions em produção e envio em escala) podem exigir Blaze e gerar custos. Esta implementação não ativa faturamento nem configura Functions, FCM ou Storage. Verifique os limites atuais no Console e na página oficial de preços antes de evoluir.
+
+## 9. Observações
+
+Nunca versione `google-services.json`, credenciais administrativas, chaves privadas, senhas ou tokens. O JSON de configuração de app Firebase não é uma credencial administrativa, mas identifica o projeto e fica fora do Git por prudência e para cada desenvolvedor usar seu ambiente.

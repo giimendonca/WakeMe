@@ -13,21 +13,23 @@ O roadmap organiza o desenvolvimento por entregas. As etapas podem ser ajustadas
 ## Fase 1 — Fundação do aplicativo
 - [x] Definir arquitetura de pacotes.
 - [x] Configurar tema Material 3.
-- [ ] Implementar navegação principal.
+- [x] Implementar navegação principal.
 - [x] Criar componentes reutilizáveis.
 - [x] Preparar suporte a diferentes tamanhos de tela.
 
 ## Fase 2 — Personalização local
 - [x] Implementar temas claro e escuro.
-- [ ] Criar paletas e preferências.
+- [x] Criar paletas e preferências.
 - [ ] Implementar seleção de wallpaper.
-- [x] Persistir preferências de tema localmente.
+- [x] Persistir preferências de aparência localmente.
 
-## Fase 3 — Mensagens
-- [ ] Criar tela de mensagens.
-- [ ] Criar, editar e excluir mensagens.
-- [ ] Implementar mensagens favoritas.
-- [ ] Associar mensagens a alertas.
+## Fase 3 — Criação visual local de alertas
+- [x] Criar modelo local independente da interface para conteúdo e aparência do alerta.
+- [x] Editar título, mensagem e ícone/emojis, incluindo a opção sem ícone.
+- [x] Compor fundos sólidos, padrões de emojis configuráveis e padrões gráficos locais.
+- [x] Selecionar imagem pela galeria do Android, visualizar e remover a imagem, com opções preencher/ajustar.
+- [x] Atualizar a simulação em formato de tela cheia enquanto o alerta é editado.
+- [x] Validar conteúdo básico e limpar a criação atual.
 
 ## Fase 4 — Áudio e notificações locais
 - [ ] Criar canais de notificação.
@@ -38,12 +40,14 @@ O roadmap organiza o desenvolvimento por entregas. As etapas podem ser ajustadas
 - [ ] Documentar limitações por versão/fabricante.
 
 ## Fase 5 — Firebase e contas
-- [ ] Criar projeto Firebase.
-- [ ] Configurar Authentication.
-- [ ] Configurar Firestore.
-- [ ] Escrever e testar regras de segurança.
-- [ ] Configurar Cloud Functions.
-- [ ] Configurar FCM.
+- [ ] Criar projeto Firebase e configurar app Android localmente (manual por ambiente).
+- [x] Implementar Authentication com e-mail/senha, recuperação de senha e sessão persistente.
+- [x] Preparar perfil Firestore associado ao UID.
+- [x] Escrever regras restritas ao próprio perfil.
+- [ ] Validar regras no Firebase Emulator Suite/Console.
+- [ ] Configurar Cloud Functions (etapa futura; revisar custos antes).
+- [ ] Configurar FCM (etapa futura).
+- [ ] Parear usuários e conectar dispositivos (etapa futura).
 - [ ] Avaliar custos e plano de faturamento antes de habilitar serviços pagos.
 
 ## Fase 6 — Dispositivos e conexões
@@ -63,7 +67,12 @@ O roadmap organiza o desenvolvimento por entregas. As etapas podem ser ajustadas
 - [ ] Implementar estados individuais por dispositivo.
 - [ ] Implementar histórico.
 
-## Fase 8 — Qualidade e distribuição
+## Fase 8 — Mensagens personalizadas reutilizáveis
+- [ ] Criar, editar e excluir mensagens salvas.
+- [ ] Implementar mensagens favoritas.
+- [ ] Associar mensagens salvas a alertas.
+
+## Fase 9 — Qualidade e distribuição
 - [ ] Testar no Samsung Galaxy M23.
 - [ ] Testar no Motorola (modelo a confirmar).
 - [ ] Testar no tablet Samsung (modelo a confirmar).

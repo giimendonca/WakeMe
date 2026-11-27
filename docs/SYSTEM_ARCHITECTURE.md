@@ -32,6 +32,15 @@ A organização interna será definida por funcionalidades e responsabilidades, 
 
 ## 3. Firebase
 
+### Escopo implementado nesta etapa
+
+- Firebase Authentication com e-mail/senha fornece o UID e mantém a sessão no dispositivo.
+- `AuthRepository` e `ProfileRepository` isolam os SDKs Firebase das telas. `AuthViewModel` expõe sessão, carregamento e mensagens.
+- O perfil é armazenado em `/users/{uid}` com `uid`, `name`, `email`, `createdAt` e `updatedAt`. Datas são escritas com horário do servidor; atualizações mantêm `createdAt`.
+- `firestore.rules` exige que o UID autenticado corresponda ao ID do documento e que o e-mail corresponda à conta. Não existem permissões abertas para outras coleções.
+- A configuração específica do projeto não é incluída no Git. Sem `app/google-services.json`, o app mostra instruções de setup.
+- Ainda não há integração com Functions, FCM ou Storage nesta entrega.
+
 ### Firebase Authentication
 Responsável pela identidade e autenticação das contas individuais.
 

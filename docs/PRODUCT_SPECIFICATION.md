@@ -12,6 +12,8 @@ O produto também oferece histórico, wallpapers e temas personalizáveis.
 
 **Frase do produto:** *Stay connected. Even when they're asleep.*
 
+**Prioridade de desenvolvimento:** a criação de alertas com mensagem e identidade visual é a experiência central. As próximas etapas devem avançar da criação para a reprodução local e, depois, para a transmissão autorizada entre dispositivos. A aparência geral do aplicativo permanece disponível como configuração secundária.
+
 ## 2. Público e cenário inicial
 
 O primeiro cenário de uso envolve duas pessoas, cada uma com sua própria conta e um ou mais dispositivos Android. A arquitetura não deve limitar o produto a casais: qualquer pessoa poderá estabelecer conexões autorizadas com outras.
@@ -39,6 +41,9 @@ Uma conexão só se torna ativa depois que o convite é aceito. Qualquer partici
 ## 4. Funcionalidades principais
 
 ### 4.1 Alarmes remotos
+- Compor localmente título, mensagem, ícone opcional e aparência visual independente.
+- Visualizar no editor uma simulação local do alerta antes de qualquer envio.
+- Disponibilizar fundos incluídos no app e imagens escolhidas pela pessoa no seletor de mídia do Android.
 - Enviar alertas para uma pessoa conectada.
 - Selecionar os dispositivos destinatários.
 - Reproduzir um som configurável no dispositivo receptor.
@@ -73,11 +78,11 @@ Uma conexão só se torna ativa depois que o convite é aceito. Qualquer partici
 ## 5. Navegação inicial
 
 Áreas previstas:
-1. Início — painel e envio de alertas.
+1. Início — painel do aplicativo.
 2. Conexões — pessoas conectadas e convites.
-3. Mensagens — mensagens personalizadas e favoritas.
+3. Alertas — criação e personalização de alertas, com transmissão futura.
 4. Histórico — alertas anteriores e seus estados.
-5. Personalização — temas e wallpapers.
+5. Aparência — temas e wallpapers como preferências secundárias.
 6. Configurações — conta, dispositivos, notificações e permissões.
 
 A estrutura poderá ser refinada durante prototipação e testes de usabilidade.
